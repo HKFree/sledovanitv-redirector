@@ -16,3 +16,7 @@
   ani používat skutečná hesla. Upravuj testy podle změn chování, nikoli kosmetiky.
 - `readme.md` udržuj stručný, provozní a API detaily ukládej do `doc/`.
 - Texty pro návštěvníky a dokumentaci piš česky v UTF-8.
+- Kontejnery a CI popisuje `doc/kontejnery.md`. Do image ani build kontextu
+  nepřidávej `.env`. Udržuj stejnou verzi uv a Pythonu v Dockerfile a CI.
+- Docker v tomto pracovním prostředí nespouštěj. Build a běh kontejneru ověřuje
+  GitHub Actions; lokálně kontroluj konfiguraci staticky a spusť Python testy.

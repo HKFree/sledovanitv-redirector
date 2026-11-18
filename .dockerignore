@@ -1,0 +1,10 @@
+# Do build kontextu patri pouze zdrojove soubory potrebne pro image.
+*
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!readme.md
+!app.py
+!server.py
+!templates/
+!templates/**

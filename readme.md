@@ -13,5 +13,10 @@ uv run python server.py
 
 Výchozí adresa je `http://127.0.0.1:8080/`.
 
+Pro Docker Compose nastavte v `.env` také `APP_IMAGE` a spusťte
+`docker compose up -d`. Aplikace bude dostupná na portu `4251`.
+GitHub Actions po testech sestaví image a při pushi jej publikuje do GHCR.
+
 Testy: `uv run pytest`. Podrobnosti: [provoz](doc/provoz.md),
-[userdb API](doc/userdb-api.md). Python ≥ 3.12, závislosti spravuje `uv` v `.venv`.
+[kontejnery a CI](doc/kontejnery.md), [userdb API](doc/userdb-api.md).
+Python ≥ 3.12, závislosti spravuje `uv` v `.venv`.
