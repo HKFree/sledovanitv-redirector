@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="cs">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if reason == 'login_used' %}Login již existuje{% else %}Identifikace selhala{% endif %}</title>
+<body>
+<h1>{% if reason == 'login_used' %}Login již existuje{% else %}Identifikace selhala{% endif %}</h1>
+{% if reason == 'login_used' %}
+<p>E-mail <strong>{{ email }}</strong> již existuje u jiného partnera SledovaniTV.cz.
+Pravděpodobně jste se registrovali již v minulosti. Požádejte svého poskytovatele internetu o pomoc s převodem účtu.</p>
+{% elif reason == 'unidentified' %}
+<p>Bohužel se vás nepodařilo identifikovat.</p>
+{% else %}
+<p>Registrace a přihlašování jsou dočasně mimo provoz. Zkuste to prosím později.</p>
+{% endif %}
+<p>Vaše IP adresa je: {{ ip }}</p>
+</body>
+</html>
