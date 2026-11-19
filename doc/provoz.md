@@ -39,6 +39,11 @@ této hlavičce. Nepovolujte přímý veřejný přístup k backendu při provoz
 Více proxy za sebou vyžaduje přizpůsobení konfigurace a ověření předávané IP.
 Pro nginx na Docker hostiteli použijte [ukázkovou konfiguraci a návod](nginx.md).
 
+Pro ověření IP použijte `GET /ip`. Vrací pouze normalizovanou IP adresu jako
+prostý text (stejnou hodnotu, se kterou přihlášení oslovuje userdb), bez volání
+userdb či SledovaniTV API. Respektuje zpracování důvěryhodné proxy ve Waitress
+a odpověď se neukládá do cache. Při neplatné IP vrací HTTP 400.
+
 ## Tok a chybové stavy
 
 `GET /` provede dva požadavky na userdb a poté

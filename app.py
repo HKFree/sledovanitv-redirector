@@ -15,6 +15,10 @@ class UpstreamError(Exception):
     """API nevratilo pouzitelnou odpoved."""
 
 
+def client_ip():
+    return str(ipaddress.ip_address(request.remote_addr or ''))
+
+
 def get_json(url, timeout, *, auth=None, params=None, missing_ok=False):
     # Neprebijet chyby API nasledovanim presmerovani s osobnimi udaji.
     response = requests.get(
@@ -85,10 +89,17 @@ def create_app(overrides=None):
         response.headers['Referrer-Policy'] = 'no-referrer'
         return response
 
+    @app.get('/ip')
+    def diagnostic_ip():
+        try:
+            return app.response_class(client_ip() + '\n', mimetype='text/plain')
+        except ValueError:
+            return app.response_class('Neplatná IP adresa.\n', status=400, mimetype='text/plain')
+
     @app.get('/')
     def login():
         try:
-            ip = str(ipaddress.ip_address(request.remote_addr or ''))
+            ip = client_ip()
         except ValueError:
             return render_template('error.html', reason='unidentified', ip='neznamá'), 400
         try:

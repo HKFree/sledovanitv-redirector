@@ -124,6 +124,32 @@ def test_ipv6(client, monkeypatch):
     assert get.call_args.args[0].endswith('/get-uzivatelby-ip/2001:db8::1')
 
 
+@pytest.mark.parametrize(('remote_addr', 'expected'), [
+    ('10.107.1.2', '10.107.1.2'),
+    ('2001:0db8:0000:0000:0000:0000:0000:0001', '2001:db8::1'),
+])
+def test_diagnostic_ip_matches_userdb_ip(client, monkeypatch, remote_addr, expected):
+    get = mock_api(monkeypatch, [reply({}, 404)])
+    options = dict(environ_overrides={'REMOTE_ADDR': remote_addr},
+                   headers={'X-Forwarded-For': '10.107.9.9'})
+    response = client.get('/ip', **options)
+    assert response.status_code == 200
+    assert response.mimetype == 'text/plain'
+    assert response.text == expected + '\n'
+    assert response.headers['Cache-Control'] == 'no-store'
+    get.assert_not_called()
+    client.get('/', **options)
+    assert get.call_args.args[0].endswith('/get-uzivatelby-ip/' + expected)
+
+
+def test_diagnostic_ip_invalid_address(client, monkeypatch):
+    get = mock_api(monkeypatch, [])
+    response = client.get('/ip', environ_overrides={'REMOTE_ADDR': 'invalid'})
+    assert response.status_code == 400
+    assert response.mimetype == 'text/plain'
+    get.assert_not_called()
+
+
 def test_missing_password_fails_at_startup():
     with pytest.raises(ValueError, match='SLEDOVANITV_PASSWORD'):
         create_app({'USERDB_API_USERNAME': 'test', 'USERDB_API_PASSWORD': 'test',
