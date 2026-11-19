@@ -14,7 +14,8 @@ uv run python server.py
 Výchozí adresa je `http://127.0.0.1:8080/`.
 
 Pro Docker Compose nastavte v `.env` také `APP_IMAGE` a spusťte
-`docker compose up -d`. Aplikace bude dostupná na portu `4251`.
+`docker compose up -d`. Na Linuxu aplikace sdílí síť hostitele a poslouchá
+na `127.0.0.1:4251` za [nginxem](doc/nginx.md).
 GitHub Actions po testech sestaví image a při pushi jej publikuje do GHCR.
 
 Testy: `uv run pytest`. Podrobnosti: [provoz](doc/provoz.md),

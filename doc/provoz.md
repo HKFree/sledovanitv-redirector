@@ -24,6 +24,10 @@ Chybějící přihlašovací údaj způsobí srozumitelnou chybu při startu.
 | `HOST`, `PORT` | `127.0.0.1`, `8080` |
 | `TRUSTED_PROXY` | IP jediné důvěryhodné reverzní proxy, výchozí prázdné |
 
+Tabulka uvádí výchozí hodnoty pro samostatný běh Python serveru. Docker Compose
+používá host networking a vždy nastavuje `HOST=127.0.0.1`, `PORT=4251`
+a `TRUSTED_PROXY=127.0.0.1`, nezávisle na hodnotách těchto proměnných v `.env`.
+
 ## IP návštěvníka a proxy
 
 Identifikace vychází z `REMOTE_ADDR`. Ve výchozím nastavení server ignoruje
@@ -33,6 +37,7 @@ Identifikace vychází z `REMOTE_ADDR`. Ve výchozím nastavení server ignoruje
 (ověřte skutečnou adresu spojení). Waitress důvěřuje jednomu proxy hopu a pouze
 této hlavičce. Nepovolujte přímý veřejný přístup k backendu při provozu za proxy.
 Více proxy za sebou vyžaduje přizpůsobení konfigurace a ověření předávané IP.
+Pro nginx na Docker hostiteli použijte [ukázkovou konfiguraci a návod](nginx.md).
 
 ## Tok a chybové stavy
 

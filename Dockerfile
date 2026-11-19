@@ -13,12 +13,12 @@ FROM python:3.12-slim-bookworm AS runtime
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    HOST=0.0.0.0 \
-    PORT=8080
+    HOST=127.0.0.1 \
+    PORT=4251
 WORKDIR /app
 COPY --from=builder /app/.venv /app/.venv
 COPY app.py server.py ./
 COPY templates/ ./templates/
 USER 10001:10001
-EXPOSE 8080
+EXPOSE 4251
 CMD ["python", "server.py"]

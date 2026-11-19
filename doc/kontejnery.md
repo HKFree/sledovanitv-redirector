@@ -5,7 +5,7 @@
 `Dockerfile` používá Python 3.12 slim a dvoufázový build. Builder instaluje
 přes uv 0.11.29 do `.venv` pouze produkční závislosti podle `uv.lock`.
 Výsledný image obsahuje prostředí, aplikaci a šablony; server běží jako
-uživatel `10001:10001` na `0.0.0.0:8080`. Při startu se závislosti neinstalují.
+uživatel `10001:10001` na `127.0.0.1:4251`. Při startu se závislosti neinstalují.
 
 `.dockerignore` povoluje pouze soubory nutné k sestavení. `.env`, lokální
 `.venv`, Git, testy a dočasné soubory editoru se do build kontextu neposílají.
@@ -35,13 +35,13 @@ stroj musí přihlásit přes `docker login ghcr.io` účtem/tokenem s právem �
 
 ## Cílový stroj
 
-Stačí Docker Engine s Compose, `compose.yaml` a `.env` ve stejné složce.
+Na Linux hostiteli s nginxem stačí Docker Engine s Compose, `compose.yaml`
+a `.env` ve stejné složce.
 Není potřeba checkout zdrojových souborů ani Python/uv na hostiteli.
 V `.env` nastavte přístupy z `.env.example` a adresu image, například:
 
 ```dotenv
 APP_IMAGE=ghcr.io/organizace/hkfree_tv:latest
-BIND_ADDRESS=0.0.0.0
 ```
 
 ```sh
@@ -54,18 +54,23 @@ Stejné první dva příkazy použijte při aktualizaci. Pro nasazení konkrétn
 nebo návrat na předchozí nastavte `APP_IMAGE` s tagem `sha-<celý commit SHA>`.
 Deployment na cílový stroj probíhá ručně; CI publikuje pouze image.
 
-Compose publikuje `4251:8080`, restartuje službu po pádu a po restartu Dockeru
-(pokud nebyla ručně zastavená) a spouští ji se souborovým systémem jen pro čtení
-a bez Linux capabilities. `HOST` a `PORT` z aplikačního `.env` přepisuje na
-`0.0.0.0` a `8080`, aby se zachovalo mapování portů.
+Compose používá `network_mode: host`: aplikace sdílí síť hostitele a poslouchá
+pouze na `127.0.0.1:4251`. Nginx na stejném hostiteli se připojuje na tuto adresu.
+Docker gateway ani mapování portů se nepoužívají. Kontejner tím sdílí i přístup
+k ostatním síťovým službám hostitele. Nastavení je určené pro běžný Docker Engine
+na Linuxu; vlastnosti host networking na rootless Dockeru nebo Docker Desktopu
+je potřeba ověřit zvlášť.
 
-`BIND_ADDRESS` určuje adresu hostitele, výchozí `0.0.0.0` zpřístupňuje port 4251
-na všech IPv4 rozhraních. Za reverzní proxy na stejném hostiteli nastavte
-`BIND_ADDRESS=127.0.0.1`. Pro identifikaci musí aplikace vidět skutečnou IP člena:
-při použití proxy nastavte `TRUSTED_PROXY` na IP, ze které se proxy skutečně
-připojuje **uvnitř kontejneru** (může jít o adresu Docker gateway, nikoli
-`127.0.0.1`). Proxy musí správně nastavovat `X-Forwarded-For`. Podrobnosti
-jsou v [provozní dokumentaci](provoz.md#ip-návštěvníka-a-proxy).
+Compose nastavuje `HOST=127.0.0.1`, `PORT=4251` a `TRUSTED_PROXY=127.0.0.1`
+přímo v `environment`. Tyto hodnoty přepisují stejnojmenné proměnné z `.env`;
+proxy tedy není potřeba v `.env` nastavovat. Nginx musí přepisovat
+`X-Forwarded-For` na skutečnou IP klienta. Ukázkovou konfiguraci a postup
+nasazení najdete v [návodu pro nginx](nginx.md).
+
+Compose restartuje službu po pádu a po restartu Dockeru (pokud nebyla ručně
+zastavená) a spouští ji se souborovým systémem jen pro čtení a bez Linux
+capabilities. Při změně přístupů v `.env` spusťte
+`docker compose up -d --force-recreate app`; samotný restart nové prostředí nenačte.
 
 Příkazy `docker compose config` bez `--quiet` a `docker inspect` mohou zobrazit
 hodnoty z prostředí; jejich výstup s přístupy nezveřejňujte.

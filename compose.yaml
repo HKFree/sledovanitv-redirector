@@ -2,13 +2,13 @@ services:
   app:
     image: ${APP_IMAGE:?Nastavte APP_IMAGE na adresu image v GHCR}
     restart: unless-stopped
+    network_mode: host
     env_file:
       - .env
     environment:
-      HOST: 0.0.0.0
-      PORT: "8080"
-    ports:
-      - "${BIND_ADDRESS:-0.0.0.0}:4251:8080"
+      HOST: 127.0.0.1
+      PORT: "4251"
+      TRUSTED_PROXY: 127.0.0.1
     read_only: true
     cap_drop:
       - ALL

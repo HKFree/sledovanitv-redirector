@@ -18,5 +18,7 @@
 - Texty pro návštěvníky a dokumentaci piš česky v UTF-8.
 - Kontejnery a CI popisuje `doc/kontejnery.md`. Do image ani build kontextu
   nepřidávej `.env`. Udržuj stejnou verzi uv a Pythonu v Dockerfile a CI.
+- Compose používá host networking na Linuxu: aplikace poslouchá na
+  `127.0.0.1:4251` a důvěřuje nginxu z `127.0.0.1`. Zachovej stejné nastavení v CI.
 - Docker v tomto pracovním prostředí nespouštěj. Build a běh kontejneru ověřuje
   GitHub Actions; lokálně kontroluj konfiguraci staticky a spusť Python testy.
